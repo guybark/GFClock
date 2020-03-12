@@ -1,0 +1,86 @@
+﻿<Window x:Class="GFClock.MainWindow"
+        xmlns:Clock="clr-namespace:GFClock"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Dad's grandfather Clock" Height="400" Width="400" ResizeMode="NoResize">
+
+    <Window.Resources>
+
+        <Clock:ClockFaceImageConverter x:Key="ClockFaceImageConverter" />
+        <Clock:ClockHandImageConverter x:Key="ClockHandImageConverter" />
+
+        <Style TargetType="Clock:ClockFace">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <ImageBrush ImageSource="/GFClock;component/Assets/ClockFace.png" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding Source={x:Static SystemParameters.HighContrast}}"
+                    Value="True">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="{Binding 
+                                Converter={StaticResource ClockFaceImageConverter}, Mode=OneWay}" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Barker: Update the ClockHand class to avoid having a separate style 
+             for the big hand and the small hand. -->
+        <Style TargetType="Clock:ClockHand" x:Key="BigHandStyle">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Stretch" Value="Fill"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+            <Setter Property="Image.Source" 
+                    Value="/GFClock;component/Assets/BigHand.png" />
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding Source={x:Static SystemParameters.HighContrast}}"
+                    Value="True">
+                    <Setter Property="Image.Source" 
+                            Value="{Binding Converter={StaticResource ClockHandImageConverter}, 
+                                ConverterParameter=1, Mode=OneWay}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Clock:ClockHand" x:Key="SmallHandStyle">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Stretch" Value="Fill"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+            <Setter Property="Image.Source" 
+                    Value="/GFClock;component/Assets/SmallHand.png" />
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding Source={x:Static SystemParameters.HighContrast}}"
+                    Value="True">
+                    <Setter Property="Image.Source" 
+                            Value="{Binding Converter={StaticResource ClockHandImageConverter},
+                            ConverterParameter=2, Mode=OneWay}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+        <Clock:ClockFace x:Name="ClockFace" Focusable="True" IsTabStop="True"
+               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+               MouseLeftButtonDown="ClockFace_MouseLeftButtonDown">
+            <Grid>
+                <Clock:ClockHand x:Name="BigHand" Style="{StaticResource BigHandStyle}"
+                       Height="165" Width="24" />
+                <Clock:ClockHand x:Name="SmallHand" Style="{StaticResource SmallHandStyle}" 
+                       Height="136" Width="24" />
+            </Grid>
+        </Clock:ClockFace>
+    </Grid>
+</Window>
