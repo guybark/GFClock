@@ -1,39 +1,32 @@
 ﻿<Window x:Class="GFClock.MainWindow"
         xmlns:Clock="clr-namespace:GFClock"
+        xmlns:ClockControls="clr-namespace:GFClock.Controls"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Dad's grandfather Clock" Height="400" Width="400" ResizeMode="NoResize">
+        Title="Dad's Grandfather Clock" ResizeMode="NoResize">
 
     <Window.Resources>
 
         <Clock:ClockFaceImageConverter x:Key="ClockFaceImageConverter" />
         <Clock:ClockHandImageConverter x:Key="ClockHandImageConverter" />
 
-        <Style TargetType="Clock:ClockFace">
+        <Style TargetType="ClockControls:ClockPartImage" x:Key="ClockFaceStyle">
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="Background">
-                <Setter.Value>
-                    <ImageBrush ImageSource="/GFClock;component/Assets/ClockFace.png" />
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Source" Value="/GFClock;component/Assets/ClockFace.png" />
             <Style.Triggers>
                 <DataTrigger
                     Binding="{Binding Source={x:Static SystemParameters.HighContrast}}"
                     Value="True">
-                    <Setter Property="Background">
-                        <Setter.Value>
-                            <ImageBrush ImageSource="{Binding 
-                                Converter={StaticResource ClockFaceImageConverter}, Mode=OneWay}" />
-                        </Setter.Value>
-                    </Setter>
+                    <Setter Property="Source" Value="{Binding 
+                        Converter={StaticResource ClockFaceImageConverter}, Mode=OneWay}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
-        <!-- Barker: Update the ClockHand class to avoid having a separate style 
-             for the big hand and the small hand. -->
-        <Style TargetType="Clock:ClockHand" x:Key="BigHandStyle">
+        <!-- Barker Todo: Update the ClockPartImage class to avoid having  
+             a separate style for the big hand and the small hand. -->
+        <Style TargetType="ClockControls:ClockPartImage" x:Key="BigHandStyle">
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
             <Setter Property="Stretch" Value="Fill"/>
@@ -51,7 +44,7 @@
             </Style.Triggers>
         </Style>
 
-        <Style TargetType="Clock:ClockHand" x:Key="SmallHandStyle">
+        <Style TargetType="ClockControls:ClockPartImage" x:Key="SmallHandStyle">
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
             <Setter Property="Stretch" Value="Fill"/>
@@ -69,18 +62,43 @@
             </Style.Triggers>
         </Style>
 
+        <Style TargetType="{x:Type TextBlock}" x:Key="TimeStatusStyle">
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding Source={x:Static SystemParameters.HighContrast}}"
+                    Value="False">
+                    <Setter Property="Foreground" Value="DarkBlue" />
+                    <Setter Property="Background" Value="Gold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
     </Window.Resources>
 
     <Grid>
-        <Clock:ClockFace x:Name="ClockFace" Focusable="True" IsTabStop="True"
-               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-               MouseLeftButtonDown="ClockFace_MouseLeftButtonDown">
+        <!-- Barker Todo: Remove all this fixed size stuff. -->
+        <ClockControls:ClockFace Grid.Row="0" x:Name="ClockFace" 
+                Width="400"
+                MouseLeftButtonDown="ClockFace_MouseLeftButtonDown">
             <Grid>
-                <Clock:ClockHand x:Name="BigHand" Style="{StaticResource BigHandStyle}"
-                       Height="165" Width="24" />
-                <Clock:ClockHand x:Name="SmallHand" Style="{StaticResource SmallHandStyle}" 
-                       Height="136" Width="24" />
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="400" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ClockControls:ClockPartImage x:Name="ClockFaceImage" Style="{StaticResource ClockFaceStyle}" />
+                <ClockControls:ClockPartImage x:Name="BigHand" Style="{StaticResource BigHandStyle}"
+                        Height="165" Width="24" />
+                <ClockControls:ClockPartImage x:Name="SmallHand" Style="{StaticResource SmallHandStyle}" 
+                        Height="136" Width="24" />
+                <!-- If this app needs to run on machines where the LiveSetting is not available,
+                     consider whether use of the ClockControls:NotificationTextBlock would be
+                     useful to you and your customers. -->
+                <!-- The big padding here is only to demo some text clipping at large text sizes. -->
+                <TextBlock AutomationProperties.LiveSetting="Assertive"
+                    Grid.Row="1" x:Name="TimeStatus" Style="{StaticResource TimeStatusStyle}"
+                    TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Stretch"
+                    Padding="60 4 60 4" />
             </Grid>
-        </Clock:ClockFace>
+        </ClockControls:ClockFace>
     </Grid>
 </Window>

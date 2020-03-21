@@ -90,6 +90,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ClockFace.cs" />
+    <Compile Include="Controls\ClockPartImage.cs" />
+    <Compile Include="Controls\NotificationTextBlock.cs" />
+    <Compile Include="Converters.cs" />
     <Compile Include="Resource1.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
