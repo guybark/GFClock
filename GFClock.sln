@@ -3,20 +3,53 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GFClock", "GFClock\GFClock.csproj", "{CA550E89-4BA5-4495-B85E-FFE4F94A7916}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GFClockWinForms", "GFClockWinForms\GFClockWinForms.csproj", "{71CBEF80-1E09-48BC-804C-261C8CD2E199}"
+	ProjectSection(ProjectDependencies) = postProject
+		{054BADAB-34EF-4054-827A-EBE405951295} = {054BADAB-34EF-4054-827A-EBE405951295}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GFClockWinFormsNativeGetTextScaling", "GFClockWinFormsNativeGetTextScaling\GFClockWinFormsNativeGetTextScaling.vcxproj", "{054BADAB-34EF-4054-827A-EBE405951295}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GFClockWPF", "GFClockWPF\GFClockWPF.csproj", "{CA550E89-4BA5-4495-B85E-FFE4F94A7916}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Debug|x64.Build.0 = Debug|Any CPU
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Debug|x86.Build.0 = Debug|Any CPU
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Release|x64.ActiveCfg = Release|Any CPU
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Release|x64.Build.0 = Release|Any CPU
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Release|x86.ActiveCfg = Release|Any CPU
+		{71CBEF80-1E09-48BC-804C-261C8CD2E199}.Release|x86.Build.0 = Release|Any CPU
+		{054BADAB-34EF-4054-827A-EBE405951295}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{054BADAB-34EF-4054-827A-EBE405951295}.Debug|x64.ActiveCfg = Debug|x64
+		{054BADAB-34EF-4054-827A-EBE405951295}.Debug|x64.Build.0 = Debug|x64
+		{054BADAB-34EF-4054-827A-EBE405951295}.Debug|x86.ActiveCfg = Debug|Win32
+		{054BADAB-34EF-4054-827A-EBE405951295}.Debug|x86.Build.0 = Debug|Win32
+		{054BADAB-34EF-4054-827A-EBE405951295}.Release|Any CPU.ActiveCfg = Release|Win32
+		{054BADAB-34EF-4054-827A-EBE405951295}.Release|x64.ActiveCfg = Release|x64
+		{054BADAB-34EF-4054-827A-EBE405951295}.Release|x64.Build.0 = Release|x64
+		{054BADAB-34EF-4054-827A-EBE405951295}.Release|x86.ActiveCfg = Release|Win32
+		{054BADAB-34EF-4054-827A-EBE405951295}.Release|x86.Build.0 = Release|Win32
+		{CA550E89-4BA5-4495-B85E-FFE4F94A7916}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{CA550E89-4BA5-4495-B85E-FFE4F94A7916}.Debug|x64.ActiveCfg = Debug|x64
 		{CA550E89-4BA5-4495-B85E-FFE4F94A7916}.Debug|x64.Build.0 = Debug|x64
 		{CA550E89-4BA5-4495-B85E-FFE4F94A7916}.Debug|x86.ActiveCfg = Debug|x86
 		{CA550E89-4BA5-4495-B85E-FFE4F94A7916}.Debug|x86.Build.0 = Debug|x86
+		{CA550E89-4BA5-4495-B85E-FFE4F94A7916}.Release|Any CPU.ActiveCfg = Release|x86
 		{CA550E89-4BA5-4495-B85E-FFE4F94A7916}.Release|x64.ActiveCfg = Release|x64
 		{CA550E89-4BA5-4495-B85E-FFE4F94A7916}.Release|x64.Build.0 = Release|x64
 		{CA550E89-4BA5-4495-B85E-FFE4F94A7916}.Release|x86.ActiveCfg = Release|x86

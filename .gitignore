@@ -6,3 +6,9 @@
 /.vs/GFClock/v16/Server/sqlite3
 /.vs/GFClock/v16/.suo
 /GFClock/bin/x64/Debug
+/.vs/GFClock/v16
+/GFClockWinForms/bin/Debug
+/GFClockWinForms/obj/Debug
+/GFClockWinFormsNativeGetTextScaling/x64/Debug
+/GFClockWPF/bin/x64/Debug
+/GFClockWPF/obj
