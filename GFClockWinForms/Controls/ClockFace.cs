@@ -9,24 +9,25 @@ namespace GFClockWinForms.Controls
 {
     public class ClockFace : UserControl
     {
-        private string currentTime;
-        public string CurrentTime { get => currentTime; set => currentTime = value; }
-
-        private Label TimeStatus;
+        // Barker Todo: Enable resizing of the app.
+        private Size clockFaceSize = new Size(400, 400);
 
         private int xOffsetBigHand = 186;
         private int yOffsetBigHand = 44;
         private int xOffsetSmallHand = 185;
         private int yOffsetSmallHand = 93;
 
-        private Size clockFaceSize = new Size(400, 400);
-
-        private double angleMinute;
-        private double angleHour;
+        private Label TimeStatus;
 
         private Image imageClockFace;
         private Image imageBigHand;
         private Image imageSmallHand;
+
+        private double angleMinute;
+        private double angleHour;
+
+        private string currentTime;
+        public string CurrentTime { get => currentTime; set => currentTime = value; }
 
         // Barker Note: Don't use PictureBoxes. Can't get them out of the UIA tree,
         // and don't need them anyway. If needed, I would have lived with the Pane,
@@ -34,6 +35,9 @@ namespace GFClockWinForms.Controls
 
         public ClockFace()
         {
+            this.Dock = DockStyle.Top;
+            this.Width = clockFaceSize.Width;
+
             // Note that setting IsAccessible seems to have not effect on the 
             // accessibility of the controls once exposed through UIA.
 
@@ -42,36 +46,52 @@ namespace GFClockWinForms.Controls
             this.Paint += ClockFace_Paint;
 
             this.TimeStatus = new System.Windows.Forms.Label();
+
+            // AutoSize enables the TextBlock to grow in height when multiple
+            // lines are required to show the text. Note that the width of the
+            // TextBlock is no under the control of WinForms, and setting it
+            // explicitly in code-behind will have no effect.
             this.TimeStatus.AutoSize = true;
-            this.TimeStatus.Location = new System.Drawing.Point(0, 400);
-            this.TimeStatus.Margin = new System.Windows.Forms.Padding(0);
-            this.TimeStatus.MaximumSize = new System.Drawing.Size(800, 0);
+
+            // If instead, we'd want the TimeStatus label to be a single row
+            // with an ellipsis if required, leave AutoSize false and set 
+            // AutoEllipsis true.
+            // this.TimeStatus.AutoEllipsis = true;
+
+            this.TimeStatus.Location = new System.Drawing.Point(0, clockFaceSize.Height);
+            this.TimeStatus.MaximumSize = new System.Drawing.Size(clockFaceSize.Width, 0);
             this.TimeStatus.Name = "TimeStatus";
-            this.TimeStatus.Padding = new System.Windows.Forms.Padding(6);
-            this.TimeStatus.Size = new System.Drawing.Size(73, 37);
-            this.TimeStatus.TabIndex = 0;
-            this.TimeStatus.Text = "";
-            this.TimeStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
-            this.Controls.Add(TimeStatus);
-
-            // Barker Todo; demo ellipis...
-            //labelStatus.MaximumSize = new Size(0, 0);
-
-            this.Width = clockFaceSize.Width;
-            TimeStatus.Width = this.Width;
-
-            var factor = NativeMethods.GetTextScaling();
-            Debug.WriteLine("Barker: Current \"Make Text Bigger\" setting is " + factor);
+            // Set some arbitrary padding.
+            this.TimeStatus.Padding = new System.Windows.Forms.Padding(40, 12, 40, 12);
 
             // Note: Don't increase the font size of the whole form,
             // as this can impact the size of controls whose role is
             // other than showing text. So only apply the text scaling
             // to the label controls in the app.
 
+            var factor = NativeMethods.GetTextScaling();
+            Debug.WriteLine("Barker: Current \"Make Text Bigger\" setting is " + factor);
+
             TimeStatus.Font = new Font(
                 TimeStatus.Font.FontFamily,
                 (float)factor * TimeStatus.Font.Size);
+
+            this.TimeStatus.Width = clockFaceSize.Width;
+
+            using (Graphics g = this.CreateGraphics())
+            {
+                var points = this.TimeStatus.Font.SizeInPoints;
+                this.TimeStatus.Height = 
+                    (int)(points * g.DpiY / 72) +
+                    this.TimeStatus.Padding.Top + this.TimeStatus.Padding.Bottom;
+            }
+
+            this.TimeStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+
+            this.TimeStatus.SizeChanged += TimeStatus_SizeChanged;
+            
+            this.Controls.Add(TimeStatus);
 
             UseThemeColors();
 
@@ -83,8 +103,15 @@ namespace GFClockWinForms.Controls
             timer.Start();
         }
 
+        // Provide custom accessibility through our own AccessibleObject.
+        protected override AccessibleObject CreateAccessibilityInstance()
+        {
+            return new ClockAccessibleObject(this);
+        }
+
         private void ClockFace_Paint(object sender, PaintEventArgs e)
         {
+            // Barker Todo: Suppress the refresh until all painting's done.
             var gfx = e.Graphics;
 
             gfx.DrawImage(imageClockFace, 0, 0, 400, 400);
@@ -97,7 +124,7 @@ namespace GFClockWinForms.Controls
         }
 
         public Image RotateImage(
-            Image imgHand, 
+            Image imgHand,
             double rotationAngle,
             int xOffset,
             int yOffset,
@@ -129,9 +156,13 @@ namespace GFClockWinForms.Controls
             return bmpRotate;
         }
 
-        protected override AccessibleObject CreateAccessibilityInstance()
+        private void TimeStatus_SizeChanged(object sender, EventArgs e)
         {
-            return new ClockAccessibleObject(this);
+            // Center the TimeStatus label in the Clock control. Trying to do this
+            // through docking does seem possible given the need to AutoSize the
+            // Clock control.
+            var label = (sender as Label);
+            label.Left = (this.Width - label.Width) / 2;
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -199,8 +230,8 @@ namespace GFClockWinForms.Controls
             }
         }
 
-        // High Contrast related.
-
+        // Set up the colors and images to be shown based on whethr
+        // a high contrast theme is active.
         public void UseThemeColors()
         {
             var highContrastThemeActive = SystemInformation.HighContrast;
@@ -239,8 +270,15 @@ namespace GFClockWinForms.Controls
                 imageBigHand = global::GFClockWinForms.Properties.Resources.BigHand;
                 imageSmallHand = global::GFClockWinForms.Properties.Resources.SmallHand;
             }
+
+            // Given that the TimeStatus lable is autosizing, its width won't necessarily 
+            // be as wide at the Clock control, and as such, the background of the Clock
+            // Control may be visible outside of the label. So set the background color 
+            // of the Clock control to be the same as that of the label.
+            this.BackColor = TimeStatus.BackColor;
         }
 
+        // A custom AccessibleObject for the Clock control.
         public class ClockAccessibleObject : ControlAccessibleObject
         {
             ClockFace clockFace;
@@ -254,20 +292,23 @@ namespace GFClockWinForms.Controls
             {
                 get
                 {
+                    // Barker Todo: Localize this!
                     return "Clock";
                 }
             }
 
+            // Some related documentation is at:
             // https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.accessibleobject?view=netframework-4.8
 
             public override AccessibleRole Role
             {
                 get
                 {
-                    // Barker: This seemed handy, but in fact the control gets exposed
-                    // through UIA as a Button, so this doesn't seem helpful to the 
-                    // customer.
-                    //return AccessibleRole.Clock;
+                    // Setting AccessibleRole.Clock seemed like a good idea, but
+                    // in fact by doing this the control gets exposed through UIA
+                    // as a Button, so this doesn't seem helpful to the customer.
+                    // So expose this as an image instead.
+
                     return AccessibleRole.Graphic;
                 }
             }
@@ -284,8 +325,8 @@ namespace GFClockWinForms.Controls
             }
 
             // Have GetChildCount return zero does not impact the UIA tree.
-            // Note, some screen readers presumably would react as expected 
-            // though.
+            // Note: Despite this, some screen readers presumably may react 
+            // as expected.
         }
     }
 
