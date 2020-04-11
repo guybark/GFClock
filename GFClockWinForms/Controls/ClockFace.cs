@@ -4,10 +4,11 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Windows.Forms.Automation;
 
 namespace GFClockWinForms.Controls
 {
-    public class ClockFace : UserControl
+    public class ClockFace : UserControl, IAutomationLiveRegion
     {
         // Barker Todo: Enable resizing of the app.
         private Size clockFaceSize = new Size(400, 400);
@@ -56,7 +57,7 @@ namespace GFClockWinForms.Controls
             // If instead, we'd want the TimeStatus label to be a single row
             // with an ellipsis if required, leave AutoSize false and set 
             // AutoEllipsis true.
-            // this.TimeStatus.AutoEllipsis = true;
+            //this.TimeStatus.AutoEllipsis = true;
 
             this.TimeStatus.Location = new System.Drawing.Point(0, clockFaceSize.Height);
             this.TimeStatus.MaximumSize = new System.Drawing.Size(clockFaceSize.Width, 0);
@@ -107,6 +108,19 @@ namespace GFClockWinForms.Controls
         protected override AccessibleObject CreateAccessibilityInstance()
         {
             return new ClockAccessibleObject(this);
+        }
+
+        public AutomationLiveSetting LiveSetting
+        {
+            get
+            {
+                // Make this an Aseretive LiveRegion.
+                return AutomationLiveSetting.Assertive;
+            }
+            set
+            {
+                // For this demo code, the setting is fixed.
+            }
         }
 
         private void ClockFace_Paint(object sender, PaintEventArgs e)
@@ -177,14 +191,14 @@ namespace GFClockWinForms.Controls
             int iHours = DateTime.Now.Hour;
             int iSeconds = DateTime.Now.Second;
 
-
             // Has the hour:minute time value changed?
             var newTimeValue = iHours.ToString("D2") + ":" + iMinutes.ToString("D2");
             if (CurrentTime != newTimeValue)
             {
                 angleMinute = (iMinutes * 6) + ((double)iSeconds / 10.0);
-                angleHour = ((iHours % 12) * 30) + ((double) iMinutes / 2.0);
+                angleHour = ((iHours % 12) * 30) + ((double)iMinutes / 2.0);
 
+                // Paint the clock hands in their new position.
                 this.Refresh();
 
                 // Let assistive technologies like screen readers know 
@@ -196,18 +210,6 @@ namespace GFClockWinForms.Controls
                 // Raise a ValuePropertyChanged event. Note that a screen reader may choose
                 // not to react to the event, but AIWin can still be used to verify that the
                 // event is being raised as it should be.
-
-                // Note that the following did not get a UIA Value property changed event raised.
-                //NativeMethods.NotifyWinEvent(
-                //    NativeMethods.UIA_ValueValuePropertyId,
-                //    this.Handle, // 0, 0);
-                //    NativeMethods.OBJID_CLIENT,
-                //    NativeMethods.CHILDID_SELF);
-
-                // Note that the following did not get a UIA Value property changed event raised.
-                //this.AccessibilityNotifyClients(
-                //    AccessibleEvents.ValueChange,
-                //    NativeMethods.CHILDID_SELF);
 
                 NativeMethods.NotifyWinEvent(
                     0x800E, // EVENT_OBJECT_VALUECHANGE
@@ -293,7 +295,7 @@ namespace GFClockWinForms.Controls
                 get
                 {
                     // Barker Todo: Localize this!
-                    return "Clock";
+                    return "Grandfather Clock";
                 }
             }
 
@@ -342,8 +344,5 @@ namespace GFClockWinForms.Controls
         public const int CHILDID_SELF = 0;
         public const int OBJID_CLIENT = (unchecked((int)0xFFFFFFFC));
         public const int EVENT_OBJECT_VALUECHANGE = 0x800E;
-
-        // From uiautomationclient.h.
-        public const int UIA_ValueValuePropertyId = 30045;
     }
 }
