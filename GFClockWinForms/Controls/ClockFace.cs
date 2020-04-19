@@ -36,17 +36,29 @@ namespace GFClockWinForms.Controls
 
         public ClockFace()
         {
-            this.Dock = DockStyle.Top;
-            this.Width = clockFaceSize.Width;
+            this.Name = "ClockFace";
 
-            // Note that setting IsAccessible seems to have not effect on the 
-            // accessibility of the controls once exposed through UIA.
+            // The clock control, (which includes both the clock face and the 
+            // text display beneath it,) will always fill the entire window.
+            this.Dock = DockStyle.Fill;
 
-            this.AutoSize = true;
+            // The clock control will be resized as the app itself is resized,
+            // so paint the clock during the resize.
+            this.ResizeRedraw = true;
 
-            this.Paint += ClockFace_Paint;
+            // Don't so any space between the clock face and the containing app.
+            this.Padding = new Padding();
+            this.Margin = new Padding();
+
+            // The app can be resized down to 200x200, with any aspect ratio, so
+            // don't have the clock control be auto-sized based on its contents.
+            this.AutoSize = false;
 
             this.TimeStatus = new System.Windows.Forms.Label();
+
+            // The time label will always stick to the bottom of 
+            // the clock control.
+            this.TimeStatus.Anchor = AnchorStyles.Bottom;
 
             // AutoSize enables the TextBlock to grow in height when multiple
             // lines are required to show the text. Note that the width of the
@@ -59,12 +71,12 @@ namespace GFClockWinForms.Controls
             // AutoEllipsis true.
             //this.TimeStatus.AutoEllipsis = true;
 
-            this.TimeStatus.Location = new System.Drawing.Point(0, clockFaceSize.Height);
-            this.TimeStatus.MaximumSize = new System.Drawing.Size(clockFaceSize.Width, 0);
             this.TimeStatus.Name = "TimeStatus";
 
             // Set some arbitrary padding.
             this.TimeStatus.Padding = new System.Windows.Forms.Padding(40, 12, 40, 12);
+
+            this.TimeStatus.Margin = new Padding();
 
             // Note: Don't increase the font size of the whole form,
             // as this can impact the size of controls whose role is
@@ -78,8 +90,6 @@ namespace GFClockWinForms.Controls
                 TimeStatus.Font.FontFamily,
                 (float)factor * TimeStatus.Font.Size);
 
-            this.TimeStatus.Width = clockFaceSize.Width;
-
             using (Graphics g = this.CreateGraphics())
             {
                 var points = this.TimeStatus.Font.SizeInPoints;
@@ -88,11 +98,16 @@ namespace GFClockWinForms.Controls
                     this.TimeStatus.Padding.Top + this.TimeStatus.Padding.Bottom;
             }
 
+            this.TimeStatus.Width = clockFaceSize.Width;
+            this.TimeStatus.Left = (this.Width - TimeStatus.Width) / 2;
+
             this.TimeStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 
-            this.TimeStatus.SizeChanged += TimeStatus_SizeChanged;
-            
             this.Controls.Add(TimeStatus);
+
+            // Set up these clock control event handlers now the label creation's complete.
+            this.SizeChanged += ClockFace_SizeChanged;
+            this.Paint += ClockFace_Paint;
 
             UseThemeColors();
 
@@ -102,6 +117,14 @@ namespace GFClockWinForms.Controls
             timer.Interval = 1000;
             timer.Tick += Timer_Tick;
             timer.Start();
+        }
+
+        private void ClockFace_SizeChanged(object sender, EventArgs e)
+        {
+            // Docking the TimeStatus at the bottom of the clock control
+            // didn't behave quite as expected, so reposition it manually.
+            TimeStatus.Left = (this.Width - TimeStatus.Width) / 2;
+            TimeStatus.Top = (this.Height - TimeStatus.Height);
         }
 
         // Provide custom accessibility through our own AccessibleObject.
@@ -125,16 +148,30 @@ namespace GFClockWinForms.Controls
 
         private void ClockFace_Paint(object sender, PaintEventArgs e)
         {
-            // Barker Todo: Suppress the refresh until all painting's done.
-            var gfx = e.Graphics;
+            // First draw the face and hands to a memory bitmaps, 
+            // using offsets that work for a clock image at 400x400.
 
-            gfx.DrawImage(imageClockFace, 0, 0, 400, 400);
+            Bitmap bmpFinal = new Bitmap(clockFaceSize.Width, clockFaceSize.Height);
+            Graphics gfxFinal = Graphics.FromImage(bmpFinal);
+
+            gfxFinal.DrawImage(imageClockFace, 0, 0, clockFaceSize.Width, clockFaceSize.Height);
 
             var rotatedBigHandImage = RotateImage(imageBigHand, angleMinute, xOffsetBigHand, yOffsetBigHand, 0.6f);
-            gfx.DrawImage(rotatedBigHandImage, 0, 0);
+            gfxFinal.DrawImage(rotatedBigHandImage, 0, 0);
 
             var rotatedSmallHandImage = RotateImage(imageSmallHand, angleHour, xOffsetSmallHand, yOffsetSmallHand, 0.4f);
-            gfx.DrawImage(rotatedSmallHandImage, 0, 0);
+            gfxFinal.DrawImage(rotatedSmallHandImage, 0, 0);
+
+            // Now scale that bitmap based on the size of the app.
+            var smallestDimension = Math.Min(this.Width, this.Height - TimeStatus.Height);
+
+            var gfx = e.Graphics;
+
+            gfx.DrawImage(bmpFinal,
+                (this.Width - smallestDimension) / 2,
+                (this.Height - TimeStatus.Height - smallestDimension) / 2,
+                smallestDimension,
+                smallestDimension);
         }
 
         public Image RotateImage(
@@ -168,15 +205,6 @@ namespace GFClockWinForms.Controls
             gfxRotate.Dispose();
 
             return bmpRotate;
-        }
-
-        private void TimeStatus_SizeChanged(object sender, EventArgs e)
-        {
-            // Center the TimeStatus label in the Clock control. Trying to do this
-            // through docking does seem possible given the need to AutoSize the
-            // Clock control.
-            var label = (sender as Label);
-            label.Left = (this.Width - label.Width) / 2;
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -273,10 +301,9 @@ namespace GFClockWinForms.Controls
                 imageSmallHand = global::GFClockWinForms.Properties.Resources.SmallHand;
             }
 
-            // Given that the TimeStatus lable is autosizing, its width won't necessarily 
-            // be as wide at the Clock control, and as such, the background of the Clock
-            // Control may be visible outside of the label. So set the background color 
-            // of the Clock control to be the same as that of the label.
+            // The form background can appear around the clock depending on the size
+            // of the app window, so set the form background color to match the color
+            // of the time label.
             this.BackColor = TimeStatus.BackColor;
         }
 
