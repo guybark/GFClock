@@ -16,27 +16,37 @@ namespace GFClock.Controls
     // The ClockFace contains everything going on in the clock area.
     public class ClockFace : UserControl
     {
+        private ClockPartImage clockFace;
         private ClockPartImage bigHand;
         private ClockPartImage smallHand;
         private TextBlock timeStatus;
 
-        // These offsets and rotation center value account for where the 
-        // rotation origin appears to be in the images of the clock hands.
-        // These rough values are fine for this demo app.
+        // Barker: Tidy up the translate/scale/rotate code one day.
+        private const double xBigHandFocalPoint = 26;
+        private const double yBigHandFocalPoint = 262;
+        private const double xSmallHandFocalPoint = 30;
+        private const double ySmallHandFocalPoint = 203;
 
-        // Barker Todo: Account for the app window and clock elements
-        // being resizable in the future.
+        // The hands are center aligned, so calculcate the offset from the center
+        // of the images, to the focal points.
+        private double xBigHandTranslateOffset = xBigHandFocalPoint - ((double)49 * 0.5);
+        private double yBigHandTranslateOffset = -yBigHandFocalPoint + ((double)281 * 0.5);
+        private double xSmallHandTranslateOffset = xSmallHandFocalPoint - ((double)56 * 0.5);
+        private double ySmallHandTranslateOffset = -ySmallHandFocalPoint + ((double)232 * 0.5);
 
-        private int xOffsetBigHand = 11;
-        private int yOffsetBigHand = 49;
-        private int xOffsetSmallHand = 11;
-        private int yOffsetSmallHand = 83;
-        private int xRotateCenterBigHand = 13;
-        private int yRotateCenterBigHand = 153;
-        private int xRotateCenterSmallHand = 13;
-        private int yRotateCenterSmallHand = 119;
+        // For this demo code, just hard-code some scaling offsets that work well enough
+        // for the clock hands images.
+        private double xBigHandScaleOffset = 30;
+        private double yBigHandScaleOffset = 140;
+        private double xSmallHandScaleOffset = 30;
+        private double ySmallHandScaleOffset = 120;
 
-        public delegate void SetClockHandsUIDelegate();
+        private ScaleTransform bigHandScaleTransform = new ScaleTransform();
+        private TranslateTransform bigHandTranslateTransform = new TranslateTransform();
+        private ScaleTransform smallHandScaleTransform = new ScaleTransform();
+        private TranslateTransform smallHandTranslateTransform = new TranslateTransform();
+
+        public delegate void SetClockHandsUIDelegate(bool forceUpdate);
 
         private string currentTime;
         public string CurrentTime { get => currentTime; set => currentTime = value; }
@@ -48,18 +58,13 @@ namespace GFClock.Controls
 
         private void ClockFace_Loaded(object sender, RoutedEventArgs e)
         {
+            clockFace = (ClockPartImage)GetDescendantFromName(this, "ClockFaceImage");
             bigHand = (ClockPartImage)GetDescendantFromName(this, "BigHand");
             smallHand = (ClockPartImage)GetDescendantFromName(this, "SmallHand");
             timeStatus = (TextBlock)GetDescendantFromName(this, "TimeStatus");
 
-            // Move the hands so that they appears to be attached at the 
-            // center of the clock face.
-            var xOffsetWindow = this.Width / 2;
-            bigHand.Margin = new Thickness(xOffsetWindow - xOffsetBigHand, yOffsetBigHand, 0, 0);
-            smallHand.Margin = new Thickness(xOffsetWindow - xOffsetSmallHand, yOffsetSmallHand, 0, 0);
-
-            // Set the hands to the current time.
-            SetClockHands();
+            // Set the hands to the appropriate size and current time.
+            ResizeHands();
 
             // Update the clock visuals every 1 second. This level of accuracy
             // is fine for this demo app.
@@ -95,24 +100,59 @@ namespace GFClock.Controls
             return element;
         }
 
+        public void ResizeHands()
+        {
+            if (clockFace == null)
+            {
+                return;
+            }
+
+            var smallestDimension = Math.Min(clockFace.ActualWidth, clockFace.ActualHeight);
+            double scaleHands = (0.6 * smallestDimension) / 400;
+
+            bigHandTranslateTransform = new TranslateTransform(xBigHandTranslateOffset, yBigHandTranslateOffset);
+            bigHandScaleTransform = new ScaleTransform(scaleHands, scaleHands, xBigHandScaleOffset, yBigHandScaleOffset);
+
+            smallHandTranslateTransform = new TranslateTransform(xSmallHandTranslateOffset, ySmallHandTranslateOffset);
+            smallHandScaleTransform = new ScaleTransform(scaleHands, scaleHands, xSmallHandScaleOffset, ySmallHandScaleOffset);
+
+            SetClockHands(true);
+        }
+
         // Update the clock hands to reflect the current time.
-        void SetClockHands()
+        private void SetClockHands(bool forceUpdate)
         {
             int iMinutes = DateTime.Now.Minute;
             int iHours = DateTime.Now.Hour;
             int iSeconds = DateTime.Now.Second;
 
-            double angleMinute = (iMinutes * 6) + ((double)iSeconds / 10.0);
-            double angleHour = ((iHours % 12) * 30) + ((double)iMinutes / 2.0);
-
-            // Rotate the hands.
-            bigHand.RenderTransform = new RotateTransform(angleMinute, xRotateCenterBigHand, yRotateCenterBigHand);
-            smallHand.RenderTransform = new RotateTransform(angleHour, xRotateCenterSmallHand, yRotateCenterSmallHand);
+            iHours = 13;
+            iMinutes = 0;
 
             // Has the hour:minute time value changed?
             var newTimeValue = iHours.ToString("D2") + ":" + iMinutes.ToString("D2");
-            if (CurrentTime != newTimeValue)
+            if (forceUpdate || (CurrentTime != newTimeValue))
             {
+                double angleMinute = (iMinutes * 6) + ((double)iSeconds / 10.0);
+                double angleHour = ((iHours % 12) * 30) + ((double)iMinutes / 2.0);
+
+                // Rotate and scale the hands.
+                var bigHandRotateTransform = new RotateTransform(angleMinute, xBigHandFocalPoint, yBigHandFocalPoint);
+
+                var bigHandTransformGroup = new TransformGroup();
+                bigHandTransformGroup.Children.Add(bigHandRotateTransform);
+                bigHandTransformGroup.Children.Add(bigHandTranslateTransform);
+                bigHandTransformGroup.Children.Add(bigHandScaleTransform);
+                bigHand.RenderTransform = bigHandTransformGroup;
+
+                var smallHandRotateTransform = new RotateTransform(angleHour, xSmallHandFocalPoint, ySmallHandFocalPoint);
+
+                var smallHandTransformGroup = new TransformGroup();
+                smallHandTransformGroup.Children.Add(smallHandRotateTransform);
+                smallHandTransformGroup.Children.Add(smallHandTranslateTransform);
+                smallHandTransformGroup.Children.Add(smallHandScaleTransform);
+                smallHand.RenderTransform = smallHandTransformGroup;
+
                 // Let assistive technologies like screen readers know 
                 // that the programmatic value of the clock has changed.
 
@@ -164,7 +204,7 @@ namespace GFClock.Controls
         void timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             SetClockHandsUIDelegate fn = new SetClockHandsUIDelegate(SetClockHands);
-            Dispatcher.BeginInvoke(fn, null);
+            Dispatcher.BeginInvoke(fn, false);
         }
 
         // Customize the programmatic accessibility of this control 

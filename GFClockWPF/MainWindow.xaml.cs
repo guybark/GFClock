@@ -27,9 +27,6 @@ namespace GFClock
             this.Left = SystemParameters.PrimaryScreenWidth - this.Width  - iOffset;
             this.Top  = iOffset;
 
-            // Automatically resize height and width relative to content.
-            this.SizeToContent = SizeToContent.WidthAndHeight;
-
             ClockFace.Focus();
         }
 
@@ -61,6 +58,11 @@ namespace GFClock
         {
             // Enable a drag of the clock from anywhere on the clock face.
             DragMove();
+        }
+
+        private void ClockFace_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ClockFace.ResizeHands();
         }
     }
 
