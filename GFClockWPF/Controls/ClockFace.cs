@@ -125,9 +125,6 @@ namespace GFClock.Controls
             int iHours = DateTime.Now.Hour;
             int iSeconds = DateTime.Now.Second;
 
-            iHours = 13;
-            iMinutes = 0;
-
             // Has the hour:minute time value changed?
             var newTimeValue = iHours.ToString("D2") + ":" + iMinutes.ToString("D2");
             if (forceUpdate || (CurrentTime != newTimeValue))
