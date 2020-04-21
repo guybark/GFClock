@@ -56,10 +56,6 @@ namespace GFClockWinForms.Controls
 
             this.TimeStatus = new System.Windows.Forms.Label();
 
-            // The time label will always stick to the bottom of 
-            // the clock control.
-            this.TimeStatus.Anchor = AnchorStyles.Bottom;
-
             // AutoSize enables the TextBlock to grow in height when multiple
             // lines are required to show the text. Note that the width of the
             // TextBlock is no under the control of WinForms, and setting it
@@ -121,8 +117,20 @@ namespace GFClockWinForms.Controls
 
         private void ClockFace_SizeChanged(object sender, EventArgs e)
         {
-            // Docking the TimeStatus at the bottom of the clock control
-            // didn't behave quite as expected, so reposition it manually.
+            this.TimeStatus.MaximumSize = new Size(this.Width, 0);
+
+            SetTimeStatusLocation();
+        }
+
+        private void SetTimeStatusLocation()
+        {
+            // Anchoring the TimeStatus at the bottom of the clock control,
+            // in combination with having it autosize, didn'generated quite
+            // the desired behavior, so reposition it manually.
+
+            // Barker: Get the anchoring to work as required and remove this
+            // explicit location setting action.
+
             TimeStatus.Left = (this.Width - TimeStatus.Width) / 2;
             TimeStatus.Top = (this.Height - TimeStatus.Height);
         }
@@ -257,6 +265,8 @@ namespace GFClockWinForms.Controls
                     // makes it straightforward to raise a Notification event.
                     this.AccessibilityObject.RaiseLiveRegionChanged();
                 }
+
+                SetTimeStatusLocation();
             }
         }
 
