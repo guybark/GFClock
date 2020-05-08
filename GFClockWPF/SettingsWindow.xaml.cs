@@ -38,7 +38,7 @@ namespace GFClock
             clockData.Add(new ClockData(false, "Dad's Grandfather Clock", "1777", "GFClock"));
             clockData.Add(new ClockData(true, "Deep Space Atomic Clock", "1972", "NASA"));
 
-            DG1.DataContext = clockData;
+            DetailsDataGrid.DataContext = clockData;
 
             Keyboard.AddKeyboardInputProviderAcquireFocusHandler(this, CheckRadioButton);
 
@@ -86,11 +86,6 @@ namespace GFClock
             public string Name { get; set; }
             public string Date { get; set; }
             public string Details { get; set; }
-        }
-
-        private void DG1_Sorting(object sender, DataGridSortingEventArgs e)
-        {
-
         }
     }
 

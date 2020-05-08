@@ -53,18 +53,19 @@
                 <GroupBox Header="A Bit of History" Margin="10" Padding="10">
                     <StackPanel Height="Auto">
                         <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
-                            <Label VerticalAlignment="Center" Margin="0 0 8 0"
+                            <Label Name="ClockTypeComboBoxLabel" VerticalAlignment="Center" Margin="0 0 8 0"
                                 Target="{Binding ElementName=ClockTypeComboBox}" 
                                 Content="Clock _Type:" />
                             <ComboBox Name="ClockTypeComboBox" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch"
-                                    VerticalAlignment="Center" SelectedIndex="0">
+                                VerticalAlignment="Center" SelectedIndex="0"
+                                AutomationProperties.LabeledBy="{Binding ElementName=ClockTypeComboBoxLabel}">
                                 <ComboBoxItem Content="Pendulum" />
                                 <ComboBoxItem Content="Not-pendulum" />
                             </ComboBox>
                         </StackPanel>
-                        <TextBlock>_Details:</TextBlock>
-                        <DataGrid Name="DG1" ItemsSource="{Binding}" AutoGenerateColumns="False" 
-                            Sorting="DG1_Sorting" AutomationProperties.Name="More cheese Wallace?">
+                        <Label Name="DetailsDataGridLabel" Content="_Details:" Target="{Binding ElementName=DetailsDataGrid}" />
+                        <DataGrid Name="DetailsDataGrid" ItemsSource="{Binding}" AutoGenerateColumns="False"
+                            AutomationProperties.LabeledBy="{Binding ElementName=DetailsDataGridLabel}" >
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn
                                     HeaderStyle="{StaticResource StatusHeaderStyle}"
