@@ -75,35 +75,58 @@
             </Style.Triggers>
         </Style>
 
+        <Style TargetType="{x:Type Grid}" x:Key="MainGridStyle">
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding Source={x:Static SystemParameters.HighContrast}}"
+                    Value="False">
+                    <Setter Property="Background" Value="Gold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
     </Window.Resources>
 
-    <Grid>
-        <!-- Barker Todo: Remove all this fixed size stuff. -->
-        <ClockControls:ClockFace Grid.Row="0" x:Name="ClockFace" 
-                MouseLeftButtonDown="ClockFace_MouseLeftButtonDown">
+    <Grid Style="{StaticResource MainGridStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Menu Grid.Column="0" Width="Auto" Height="Auto">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Close" Click="CloseMenuItem_Click" />
+            </MenuItem>
+            <MenuItem Header="_Settings">
+                <MenuItem Header="_Settings..." Click="SettingsMenuItem_Click" />
+            </MenuItem>
+        </Menu>
+        <ClockControls:ClockFace Grid.Row="1" x:Name="ClockFace" 
+            MouseLeftButtonDown="ClockFace_MouseLeftButtonDown">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ClockControls:ClockPartImage x:Name="ClockFaceImage" Style="{StaticResource ClockFaceStyle}" 
-                    HorizontalAlignment="Center" VerticalAlignment="Center" SizeChanged="ClockFace_SizeChanged" />
-                
+                <ClockControls:ClockPartImage x:Name="ClockFaceImage" 
+                    Style="{StaticResource ClockFaceStyle}" 
+                    HorizontalAlignment="Center" VerticalAlignment="Center" 
+                    SizeChanged="ClockFace_SizeChanged" />
+
                 <!-- Specify the actual sizes of the clock hand images, and translate/rotate/scale as necessary. -->
                 <ClockControls:ClockPartImage x:Name="BigHand" Style="{StaticResource BigHandStyle}"
-                        Height="281" Width="49"
-                        HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    Height="281" Width="49"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
                 <ClockControls:ClockPartImage x:Name="SmallHand" Style="{StaticResource SmallHandStyle}" 
-                        Height="232" Width="56"
-                        HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    Height="232" Width="56"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
                 <!-- If this app needs to run on machines where the LiveSetting is not available,
-                     consider whether use of the ClockControls:NotificationTextBlock would be
-                     useful to you and your customers. -->
+                    consider whether use of the ClockControls:NotificationTextBlock would be
+                    useful to you and your customers. -->
                 <!-- The big padding here is only to demo some text clipping at large text sizes. -->
                 <TextBlock AutomationProperties.LiveSetting="Assertive"
-                    Grid.Row="1" x:Name="TimeStatus" Style="{StaticResource TimeStatusStyle}"
-                    TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Stretch"
-                    Padding="60 4 60 4" />
+                Grid.Row="1" x:Name="TimeStatus" Style="{StaticResource TimeStatusStyle}"
+                TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Stretch"
+                Padding="60 4 60 4" />
             </Grid>
         </ClockControls:ClockFace>
     </Grid>

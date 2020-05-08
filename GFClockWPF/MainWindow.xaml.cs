@@ -15,43 +15,6 @@ namespace GFClock
         public MainWindow()
         {
             InitializeComponent();
-
-            this.SourceInitialized += MainWindow_SourceInitialized;
-
-            // Always position the clock near the top right on the primary monitor.
-
-            // Barker Todo: Only do this on first run. After that, remember 
-            // where the customer moved the window to.
-            int iOffset = 32;
-
-            this.Left = SystemParameters.PrimaryScreenWidth - this.Width  - iOffset;
-            this.Top  = iOffset;
-
-            ClockFace.Focus();
-        }
-
-        // Add the Minimize button back onto the app caption bar after it
-        // got removed through my use of ResizeMode="NoResize" in the XAML.
-        private void MainWindow_SourceInitialized(object sender, EventArgs e)
-        {
-            _windowHandle = new WindowInteropHelper(this).Handle;
-
-            EnableMinimizeButton();
-        }
-
-        protected void EnableMinimizeButton()
-        {
-            if (_windowHandle != IntPtr.Zero)
-            {
-                var style = NativeWin32.GetWindowLong(
-                    _windowHandle,
-                    NativeWin32.GWL_STYLE);
-
-                NativeWin32.SetWindowLong(
-                    _windowHandle,
-                    NativeWin32.GWL_STYLE,
-                    style | NativeWin32.WS_MINIMIZEBOX);
-            }
         }
 
         private void ClockFace_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -63,6 +26,20 @@ namespace GFClock
         private void ClockFace_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             ClockFace.ResizeHands();
+        }
+
+        private void CloseMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var settingsWindow = new SettingsWindow(ClockFace);
+            settingsWindow.ShowDialog();
+
+            BigHand.Visibility = (ClockFace.VisibleHandCount > 1 ?
+                Visibility.Visible : Visibility.Collapsed);
         }
     }
 

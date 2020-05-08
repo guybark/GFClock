@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GFClockWinForms.Properties;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -30,12 +31,21 @@ namespace GFClockWinForms.Controls
         private string currentTime;
         public string CurrentTime { get => currentTime; set => currentTime = value; }
 
+        private float makeEverythingBiggerScaling;
+        private int yOffsetClockFace;
+
         // Barker Note: Don't use PictureBoxes. Can't get them out of the UIA tree,
         // and don't need them anyway. If needed, I would have lived with the Pane,
-        // and not to the IREP* thing.
+        // and not do the IREP* thing.
 
-        public ClockFace()
+        private int visibleHandCount = 2;
+        public int VisibleHandCount { get => visibleHandCount; set => visibleHandCount = value; }
+
+        public ClockFace(int yOffset, float makeEverythingBiggerScaling)
         {
+            this.yOffsetClockFace = yOffset;
+            this.makeEverythingBiggerScaling = makeEverythingBiggerScaling;
+
             this.Name = "ClockFace";
 
             // The clock control, (which includes both the clock face and the 
@@ -156,6 +166,11 @@ namespace GFClockWinForms.Controls
 
         private void ClockFace_Paint(object sender, PaintEventArgs e)
         {
+            RedrawClockFace(false, e.Graphics);
+        }
+
+        public void RedrawClockFace(bool forceRedraw, Graphics gfx)
+        {
             // First draw the face and hands to a memory bitmaps, 
             // using offsets that work for a clock image at 400x400.
 
@@ -164,16 +179,29 @@ namespace GFClockWinForms.Controls
 
             gfxFinal.DrawImage(imageClockFace, 0, 0, clockFaceSize.Width, clockFaceSize.Height);
 
-            var rotatedBigHandImage = RotateImage(imageBigHand, angleMinute, xOffsetBigHand, yOffsetBigHand, 0.6f);
-            gfxFinal.DrawImage(rotatedBigHandImage, 0, 0);
+            if (visibleHandCount > 1)
+            {
+                var rotatedBigHandImage = RotateImage(
+                    imageBigHand,
+                    angleMinute,
+                    xOffsetBigHand,
+                    yOffsetBigHand,
+                    0.6f / this.makeEverythingBiggerScaling);
+                gfxFinal.DrawImage(rotatedBigHandImage, 0, 0);
+            }
 
-            var rotatedSmallHandImage = RotateImage(imageSmallHand, angleHour, xOffsetSmallHand, yOffsetSmallHand, 0.4f);
+            var rotatedSmallHandImage = RotateImage(
+                imageSmallHand, 
+                angleHour, 
+                xOffsetSmallHand, 
+                yOffsetSmallHand, 
+                0.4f / this.makeEverythingBiggerScaling);
             gfxFinal.DrawImage(rotatedSmallHandImage, 0, 0);
 
             // Now scale that bitmap based on the size of the app.
-            var smallestDimension = Math.Min(this.Width, this.Height - TimeStatus.Height);
-
-            var gfx = e.Graphics;
+            var smallestDimension = Math.Min(
+                this.Width, 
+                this.Height - TimeStatus.Height - yOffsetClockFace);
 
             gfx.DrawImage(bmpFinal,
                 (this.Width - smallestDimension) / 2,
@@ -377,9 +405,31 @@ namespace GFClockWinForms.Controls
         [DllImport("user32.dll")]
         public static extern void NotifyWinEvent(int winEvent, IntPtr hwnd, int objType, int objID);
 
-        // From winuser.h.
         public const int CHILDID_SELF = 0;
         public const int OBJID_CLIENT = (unchecked((int)0xFFFFFFFC));
         public const int EVENT_OBJECT_VALUECHANGE = 0x800E;
+
+        public const int MONITOR_DEFAULTTONULL = 0;
+        public const int MONITOR_DEFAULTTOPRIMARY = 1;
+        public const int MONITOR_DEFAULTTONEAREST = 2;
+
+        public enum MONITOR_DPI_TYPE
+        {
+            MDT_EFFECTIVE_DPI,
+            MDT_ANGULAR_DPI,
+            MDT_RAW_DPI,
+            MDT_DEFAULT
+        };
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
+
+        [DllImport("shcore.dll")]
+        public static extern int GetDpiForMonitor(
+            IntPtr hMon,
+            MONITOR_DPI_TYPE dpiType,
+            out int dpiX,
+            out int dpiY
+        );
     }
 }

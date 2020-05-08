@@ -50,6 +50,9 @@ namespace GFClock.Controls
         private string currentTime;
         public string CurrentTime { get => currentTime; set => currentTime = value; }
 
+        private int visibleHandCount = 2;
+        public int VisibleHandCount { get => visibleHandCount; set => visibleHandCount = value; }
+
         public ClockFace()
         {
             this.Loaded += ClockFace_Loaded;
@@ -133,13 +136,17 @@ namespace GFClock.Controls
                 double angleHour = ((iHours % 12) * 30) + ((double)iMinutes / 2.0);
 
                 // Rotate and scale the hands.
-                var bigHandRotateTransform = new RotateTransform(angleMinute, xBigHandFocalPoint, yBigHandFocalPoint);
 
-                var bigHandTransformGroup = new TransformGroup();
-                bigHandTransformGroup.Children.Add(bigHandRotateTransform);
-                bigHandTransformGroup.Children.Add(bigHandTranslateTransform);
-                bigHandTransformGroup.Children.Add(bigHandScaleTransform);
-                bigHand.RenderTransform = bigHandTransformGroup;
+                if (visibleHandCount > 1)
+                {
+                    var bigHandRotateTransform = new RotateTransform(angleMinute, xBigHandFocalPoint, yBigHandFocalPoint);
+
+                    var bigHandTransformGroup = new TransformGroup();
+                    bigHandTransformGroup.Children.Add(bigHandRotateTransform);
+                    bigHandTransformGroup.Children.Add(bigHandTranslateTransform);
+                    bigHandTransformGroup.Children.Add(bigHandScaleTransform);
+                    bigHand.RenderTransform = bigHandTransformGroup;
+                }
 
                 var smallHandRotateTransform = new RotateTransform(angleHour, xSmallHandFocalPoint, ySmallHandFocalPoint);
 
