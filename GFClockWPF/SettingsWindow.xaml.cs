@@ -33,10 +33,10 @@ namespace GFClock
             this.ShowInTaskbar = false;
 
             ObservableCollection<ClockData> clockData = new ObservableCollection<ClockData>();
-            clockData.Add(new ClockData(false, "Sundial", "4000 years ago", "Sundials"));
-            clockData.Add(new ClockData(true, "Big Ben", "1860", "Big Ben"));
+            clockData.Add(new ClockData(false, "Sundials", "2000 years ago", "Sundials"));
+            clockData.Add(new ClockData(true, "Big Ben", "1859", "Big Ben"));
             clockData.Add(new ClockData(false, "Dad's Grandfather Clock", "1777", "GFClock"));
-            clockData.Add(new ClockData(true, "Deep Space Atomic Clock", "1972", "NASA"));
+            clockData.Add(new ClockData(true, "Deep Space Atomic Clock", "2019", "NASA"));
 
             DetailsDataGrid.DataContext = clockData;
 

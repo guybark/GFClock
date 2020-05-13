@@ -34,10 +34,10 @@ namespace GFClockWinForms
             var imageRunning = global::GFClockWinForms.Properties.Resources.ClockFace;
             var imageNotRunning = new Bitmap(1, 1);
 
-            dataGridViewDetails.Rows.Add(imageRunning, "Sundial", "4000 years ago", "Sundials");
-            dataGridViewDetails.Rows.Add(imageNotRunning, "Big Ben", "1860", "Big Ben");
+            dataGridViewDetails.Rows.Add(imageRunning, "Sundials", "2000 years ago", "Sundials");
+            dataGridViewDetails.Rows.Add(imageNotRunning, "Big Ben", "1859", "Big Ben");
             dataGridViewDetails.Rows.Add(imageRunning, "Dad's Grandfather Clock", "1777", "GFClock");
-            dataGridViewDetails.Rows.Add(imageNotRunning, "Deep Space Atomic Clock", "1974", "NASA");
+            dataGridViewDetails.Rows.Add(imageNotRunning, "Deep Space Atomic Clock", "2019", "NASA");
 
             dataGridViewDetails.SortCompare += DataGridViewDetails_SortCompare;
             dataGridViewDetails.Columns[0].SortMode = DataGridViewColumnSortMode.Automatic;
