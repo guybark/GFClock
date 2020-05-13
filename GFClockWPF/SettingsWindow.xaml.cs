@@ -40,9 +40,18 @@ namespace GFClock
 
             DetailsDataGrid.DataContext = clockData;
 
+            this.Loaded += SettingsWindow_Loaded;
+
             Keyboard.AddKeyboardInputProviderAcquireFocusHandler(this, CheckRadioButton);
 
             this.Closing += SettingsWindow_Closing;
+        }
+
+        private void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Set focus to the first control in the window after the 
+            // UI's been fully loaded.
+            IntroLink.Focus();
         }
 
         private void SettingsWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

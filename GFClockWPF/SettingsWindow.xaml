@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Settings" 
         SizeToContent="WidthAndHeight"
-        MaxWidth="400" MaxHeight="600"
+        MaxWidth="360" MaxHeight="600"
         ResizeMode="NoResize">
 
     <Window.Resources>
@@ -30,6 +30,15 @@
                 Converter={StaticResource StatusToAccessibleNameConverter}}"/>
         </Style>
 
+        <!-- Without Focusable being set here, the header element gets exposed 
+             through UIA as now being focusabled. This means the customer can
+             tab to it, but Narrator will not follow focus. So make it focusable,
+             and while we're here, give it a UIA Name property too. -->
+        <!--<Style TargetType="{x:Type DataGridColumnHeadersPresenter}">
+            <Setter Property="AutomationProperties.Name" Value="All Columns" />
+            <Setter Property="Focusable" Value="True" />
+        </Style>-->
+        
     </Window.Resources>
 
     <Grid Margin="8">
@@ -41,7 +50,7 @@
         <TextBlock Grid.Row="0" Name="TextBlockWithHyperlink" TextWrapping="Wrap"
             HorizontalAlignment="Left">
             This dialog only exists to support discussion on the keyboard accessibility of WPF controls at 
-            <Hyperlink 
+            <Hyperlink x:Name="IntroLink"
                 NavigateUri="http://microsoft.com"
                 RequestNavigate="Hyperlink_RequestNavigate">
                 Real-world learnings on keyboard accessibilty in WinForms and WPF apps: Part 1
