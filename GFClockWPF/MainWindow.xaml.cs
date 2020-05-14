@@ -10,8 +10,6 @@ namespace GFClock
 {
     public partial class MainWindow : Window
     {
-        private IntPtr _windowHandle;
-
         public MainWindow()
         {
             InitializeComponent();

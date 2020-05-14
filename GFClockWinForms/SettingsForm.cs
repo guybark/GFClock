@@ -76,6 +76,11 @@ namespace GFClockWinForms
 
             comboBoxClockType.SelectedIndex = 0;
 
+            // For this demo, consider the ComboBox to be the most likely
+            // control that my customers will want to interact with when
+            // the Setting window appears.
+            comboBoxClockType.Select();
+
             // Note: This doesn't help with keyboard accessibility.
             // It shows full text for truncated cell on mouse hover.
             dataGridViewDetails.ShowCellToolTips = true;
