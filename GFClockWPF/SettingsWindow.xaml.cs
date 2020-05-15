@@ -42,7 +42,8 @@ namespace GFClock
 
             this.Loaded += SettingsWindow_Loaded;
 
-            Keyboard.AddKeyboardInputProviderAcquireFocusHandler(this, CheckRadioButton);
+            // Don't auto-check the radio buttons on focus.
+            // Keyboard.AddKeyboardInputProviderAcquireFocusHandler(this, CheckRadioButton);
 
             this.Closing += SettingsWindow_Closing;
         }
@@ -64,17 +65,18 @@ namespace GFClock
             this.Close();
         }
 
-        private void CheckRadioButton(object sender, KeyboardInputProviderAcquireFocusEventArgs e)
-        {
-            if (e.FocusAcquired)
-            {
-                var radioButton = e.Source as RadioButton;
-                if (radioButton != null)
-                {
-                    radioButton.IsChecked = true;
-                }
-            }
-        }
+        // Don't auto-check the radio buttons on focus.
+        //private void CheckRadioButton(object sender, KeyboardInputProviderAcquireFocusEventArgs e)
+        //{
+        //    if (e.FocusAcquired)
+        //    {
+        //        var radioButton = e.Source as RadioButton;
+        //        if (radioButton != null)
+        //        {
+        //            radioButton.IsChecked = true;
+        //        }
+        //    }
+        //}
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
