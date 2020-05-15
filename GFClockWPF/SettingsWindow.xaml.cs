@@ -85,6 +85,11 @@ namespace GFClock
 
         private class ClockData
         {
+            public bool Status { get; set; }
+            public string Name { get; set; }
+            public string Date { get; set; }
+            public string Details { get; set; }
+
             public ClockData(bool Status, string Name, string Date, string Details)
             {
                 this.Status = Status;
@@ -93,10 +98,11 @@ namespace GFClock
                 this.Details = Details;
             }
 
-            public bool Status { get; set; }
-            public string Name { get; set; }
-            public string Date { get; set; }
-            public string Details { get; set; }
+            public override string ToString()
+            {
+                // Provide some useful UIA Name to the DataGrid row associated with this item.
+                return this.Name;
+            }
         }
     }
 
