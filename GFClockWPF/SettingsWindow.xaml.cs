@@ -28,6 +28,10 @@ namespace GFClock
         {
             InitializeComponent();
 
+            // Prevent alt+tab being able to switch to the main window or 
+            // the Settings window separately.
+            this.Owner = App.Current.MainWindow;
+
             this.clockFace = clockFace;
 
             this.ShowInTaskbar = false;
