@@ -34,6 +34,7 @@ namespace GFClockWinForms
             var imageRunning = global::GFClockWinForms.Properties.Resources.ClockFace;
             var imageNotRunning = new Bitmap(1, 1);
 
+            // Barker Todo: Localize all this!
             dataGridViewDetails.Rows.Add(imageRunning, "Sundials", "2000 years ago", "Sundials");
             dataGridViewDetails.Rows.Add(imageNotRunning, "Big Ben", "1859", "Big Ben");
             dataGridViewDetails.Rows.Add(imageRunning, "Dad's Grandfather Clock", "1777", "GFClock");
@@ -114,7 +115,7 @@ namespace GFClockWinForms
                 { 
                     get
                     {
-                        // TODO: Localized this.
+                        // TODO: Localize this.
                         return "Status, " + base.Name;
                     }
                 }
