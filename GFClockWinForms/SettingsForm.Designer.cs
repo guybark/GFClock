@@ -69,15 +69,15 @@
             this.radioButton1.Margin = new System.Windows.Forms.Padding(2);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(158, 24);
-            this.radioButton1.TabIndex = 1;
+            this.radioButton1.TabIndex = 0;
             this.radioButton1.TabStop = true;
             this.radioButton1.Text = "Show &both hands";
             this.radioButton1.UseVisualStyleBackColor = true;
             // 
             // groupBoxGFClockDisplay
             // 
-            this.groupBoxGFClockDisplay.Controls.Add(this.radioButton2);
             this.groupBoxGFClockDisplay.Controls.Add(this.radioButton1);
+            this.groupBoxGFClockDisplay.Controls.Add(this.radioButton2);
             this.groupBoxGFClockDisplay.Location = new System.Drawing.Point(15, 436);
             this.groupBoxGFClockDisplay.Margin = new System.Windows.Forms.Padding(2);
             this.groupBoxGFClockDisplay.Name = "groupBoxGFClockDisplay";
@@ -95,7 +95,7 @@
             this.radioButton2.Margin = new System.Windows.Forms.Padding(2);
             this.radioButton2.Name = "radioButton2";
             this.radioButton2.Size = new System.Drawing.Size(145, 24);
-            this.radioButton2.TabIndex = 0;
+            this.radioButton2.TabIndex = 1;
             this.radioButton2.TabStop = true;
             this.radioButton2.Text = "Show &one hand";
             this.radioButton2.UseVisualStyleBackColor = true;
